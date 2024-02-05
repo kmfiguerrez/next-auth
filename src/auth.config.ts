@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials"
 
 import LoginSchema from "./schemas/login-form"
 import { getUserByEmail } from "./data/user"
-import bcrypt from "bcrypt"
+import bcrypt from "bcryptjs"
 
 
 
