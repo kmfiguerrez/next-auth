@@ -18,12 +18,11 @@ export default {
           const { email, password } = validatedFields.data
 
           const user = await getUserByEmail(email)
-          console.log("user: ", user)
+          // console.log("user: ", user)
           // !user.password is when google or other providers is used.
           if (!user || !user.password) return null
 
-          const passwordsMatch = await bcrypt.compare(password, user.password)
-          console.log("password match: ", passwordsMatch)
+          const passwordsMatch = await bcrypt.compare(password, user.password)          
           if (passwordsMatch) return user
         }
 
