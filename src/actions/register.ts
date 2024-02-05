@@ -3,6 +3,7 @@
 import RegisterSchema, { type TRegisterForm } from "@/schemas/register-form"
 import bcrypt from "bcrypt"
 import { db } from "@/lib/db"
+import { getUserByEmail } from "@/data/user"
 
 
 
@@ -20,11 +21,7 @@ const register = async (values: TRegisterForm) => {
   const hashedPassword = await bcrypt.hash(password, 10)
 
   // Check if email exists.
-  const existingUser = await db.user.findUnique({
-    where: {
-      email: validatedFields.data.email
-    }
-  })
+  const existingUser = await getUserByEmail(email)
   if (existingUser) return { error: "Email already in use!"}
 
   // Otherwise email doesn't exists.
@@ -36,9 +33,9 @@ const register = async (values: TRegisterForm) => {
     }
   })
 
-  // Send verification token email.
+  // TODO: Send verification token email.
 
-  return { success: "Email sent" }
+  return { success: "User created" }
 }
 
 
