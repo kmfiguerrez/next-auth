@@ -35,7 +35,7 @@ import FormSucess from '../form-success';
 const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
-  const [isPending, startTranstion] = useTransition()
+  const [isPending, startTransition] = useTransition()
 
   const reactHookForm = useForm<TRegisterForm>({
     resolver: zodResolver(RegisterSchema),
