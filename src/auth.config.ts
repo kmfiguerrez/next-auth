@@ -11,16 +11,19 @@ export default {
   providers: [
     Credentials({
       async authorize(credentials) {
+        console.log("credentials: ", credentials)
         const validatedFields = LoginSchema.safeParse(credentials)
         
         if (validatedFields.success) {
           const { email, password } = validatedFields.data
 
           const user = await getUserByEmail(email)
+          console.log("user: ", user)
           // !user.password is when google or other providers is used.
           if (!user || !user.password) return null
 
           const passwordsMatch = await bcrypt.compare(password, user.password)
+          console.log("password match: ", passwordsMatch)
           if (passwordsMatch) return user
         }
 
