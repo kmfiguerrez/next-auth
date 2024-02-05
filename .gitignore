@@ -38,3 +38,6 @@ next-env.d.ts
 
 # custom note
 note.txt
+
+# vscode settings
+.vscode
