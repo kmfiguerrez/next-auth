@@ -5,14 +5,25 @@ import { FaGithub } from 'react-icons/fa'
 
 import { Button } from '../ui/button'
 
+import { signIn } from 'next-auth/react'
+
+import { DEFAULT_LOGIN_REDIRECT } from '@/routes'
+
+
 const Social = () => {
+  const handleClick = (provider: "google" | "github") => {
+    signIn(provider, {
+      callbackUrl: DEFAULT_LOGIN_REDIRECT
+    })
+  }
+
   return (
     <div className='flex items-center w-full gap-x-2'>
 
       <Button
         size={"lg"}
         variant={"outline"}
-        onClick={() => {}}
+        onClick={() => handleClick('google')}
         className='w-full'
       >
         <FcGoogle className='h-5 w-5' />
@@ -20,7 +31,7 @@ const Social = () => {
       <Button
         size={"lg"}
         variant={"outline"}
-        onClick={() => {}}
+        onClick={() => handleClick('github')}
         className='w-full'
       >
         <FaGithub className='h-5 w-5' />

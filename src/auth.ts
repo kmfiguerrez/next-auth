@@ -13,11 +13,13 @@ import { getUserById } from "./data/user"
 //   }
 // }
 
-
+// The signIn and signOut can only be used on server components and
+// actions. If want to use on client components, use signIn and
+// signOut from next-auth/react.
 export const {
   handlers: { GET, POST },
   auth,
-  signIn,
+  signIn,  
   signOut,
 } = NextAuth({
   callbacks: {
