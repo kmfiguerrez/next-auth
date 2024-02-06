@@ -1,4 +1,5 @@
-import { auth } from '@/auth'
+import { auth, signOut } from '@/auth'
+import { Button } from '@/components/ui/button'
 import React from 'react'
 
 const SettingPage = async () => {
@@ -6,7 +7,19 @@ const SettingPage = async () => {
 
   return (
     <div>
-      {JSON.stringify(session)}
+      <p className='mb-4'>
+        {JSON.stringify(session)}
+      </p>
+
+      <form action={async () => {
+        "use server"
+
+        await signOut()
+      }}>
+        <Button>
+          Logout
+        </Button>
+      </form>
     </div>
   )
 }
