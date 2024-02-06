@@ -3,6 +3,8 @@
 import React, { startTransition, useState, useTransition } from 'react'
 import { z } from "zod";
 
+import { useSearchParams } from 'next/navigation';
+
 // Server actions.
 import { login } from '@/actions/login';
 
@@ -12,6 +14,7 @@ import LoginSchema, { type TLoginForm } from '@/schemas/login-form';
 // Custom components.
 import CardWrapper from './card-wrapper'
 import FormError from '../form-error';
+import FormSucess from '../form-success';
 
 // From react-hook-form
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -28,11 +31,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import FormSucess from '../form-success';
 
 
 
 const LoginForm = () => {
+  const searchParams = useSearchParams()
+  const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ?
+    "Email already in use with different provider" : undefined
+
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
   const [isPending, startTranstion] = useTransition()
@@ -56,8 +62,9 @@ const LoginForm = () => {
     startTransition(() => {
       login(values)
         .then(data => {
-          setError(data.error)
-          setSuccess(data.success)
+          setError(data?.error)
+          // TODO: Add when we add 2FA
+          // setSuccess(data?.success)
         })
     })
   }
@@ -80,7 +87,7 @@ const LoginForm = () => {
           <div className='space-y-4'>
 
             {/* Runtime messages. */}
-            <FormError message={error} />
+            <FormError message={error || urlError} />
             <FormSucess message={success} />
 
             <FormField
