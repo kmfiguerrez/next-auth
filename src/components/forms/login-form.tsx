@@ -5,9 +5,11 @@ import { useTransition } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
-import RegisterSchema, { type TRegisterSchema } from "@/schemas/register-schema"
+import LoginSchema, { TLoginSchema } from "@/schemas/login-schema"
 
 import { RotateCw } from "lucide-react"
+
+import { login } from "@/actions/login"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -19,26 +21,24 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { register } from "@/actions/register"
 
 
 
 
-const RegisterForm = () => {
+const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
 
   // 1. Define your form.
-  const form = useForm<TRegisterSchema>({
-    resolver: zodResolver(RegisterSchema),
-    defaultValues: {
-      name: "",
+  const form = useForm<TLoginSchema>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {      
       email: "",
       password: "",
     },
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: TRegisterSchema) {
+  function onSubmit(values: TLoginSchema) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     // console.log(values)
@@ -46,7 +46,7 @@ const RegisterForm = () => {
     if (isPending) alert("pending")
 
     startTransition(() => {
-      register(values)
+      login(values)
     })
   }  
   
@@ -54,20 +54,6 @@ const RegisterForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <FormField
           control={form.control}
@@ -104,7 +90,7 @@ const RegisterForm = () => {
               Loading
             </span>
           ) : (
-            <span>Register</span>
+            <span>Login</span>
           )}
         </Button>
 
@@ -113,4 +99,4 @@ const RegisterForm = () => {
   )
 }
 
-export default RegisterForm
+export default LoginForm
