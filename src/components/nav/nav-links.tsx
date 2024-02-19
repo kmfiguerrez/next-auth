@@ -20,7 +20,7 @@ const NavLinks = () => {
       <NavigationMenuList className="space-x-5">
 
         <NavigationMenuItem>
-          <Link href={`/register`} legacyBehavior passHref>
+          <Link href={`/auth/register`} legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Register
             </NavigationMenuLink>
@@ -28,7 +28,7 @@ const NavLinks = () => {
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <Link href={`/login`} legacyBehavior passHref>
+          <Link href={`/auth/login`} legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Login
             </NavigationMenuLink>

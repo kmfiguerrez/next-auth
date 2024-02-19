@@ -2,6 +2,10 @@ import React from 'react'
 
 import { cn } from '@/lib/utils'
 
+import Socials from './socials'
+
+import BackButton from './back-button'
+
 import {
   Card,
   CardContent,
@@ -22,7 +26,14 @@ type CardWrapperProps = {
 }
 
 
-const CardWrapper: React.FC<CardWrapperProps> = ({ children, title, className }) => {
+const CardWrapper: React.FC<CardWrapperProps> = ({ 
+  children, 
+  title, 
+  className,
+  backButtonHref,
+  backButtonLabel,
+  showSocial
+}) => {
 
   return (
     <Card className={cn(`w-[380px]`, className)}>
@@ -33,8 +44,16 @@ const CardWrapper: React.FC<CardWrapperProps> = ({ children, title, className })
       <CardContent>
         {children}
       </CardContent>
+      {showSocial &&      
+        <CardFooter>
+          <Socials />
+        </CardFooter>
+      }
       <CardFooter>
-        <Socials />
+        <BackButton
+          label={backButtonLabel}
+          href={backButtonHref}
+        />
       </CardFooter>
     </Card>
   )
