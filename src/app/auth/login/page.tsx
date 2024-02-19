@@ -5,7 +5,13 @@ import React from 'react'
 const LoginPage = () => {
   return (
     <div>
-      <CardWrapper title='Login' className='mx-auto'>
+      <CardWrapper 
+        title='Login'
+        backButtonLabel="Don't have an account?"
+        backButtonHref="/auth/register"
+        showSocial
+        className='mx-auto'
+      >
         <LoginForm />
       </CardWrapper>
     </div>
