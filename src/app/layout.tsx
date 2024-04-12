@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} m-5`}>
+      <body className={`${inter.className} m-5 bg-zinc-800`}>
         <header className="mb-5">
           <NavLinks />
         </header>

@@ -1,6 +1,6 @@
 "use client"
  
-import { useTransition } from "react"
+import { useState, useTransition } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -10,6 +10,9 @@ import LoginSchema, { TLoginSchema } from "@/schemas/login-schema"
 import { RotateCw } from "lucide-react"
 
 import { login } from "@/actions/login"
+
+import FormError from "./form-error"
+import FormSucess from "./form-success"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -25,8 +28,11 @@ import {
 
 
 
+
 const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | undefined>()
+  const [success, setSuccess] = useState<string | undefined>()
 
   // 1. Define your form.
   const form = useForm<TLoginSchema>({
@@ -39,6 +45,10 @@ const LoginForm = () => {
 
   // 2. Define a submit handler.
   function onSubmit(values: TLoginSchema) {
+    // Reset runtime messages first.
+    setSuccess(undefined)
+    setError(undefined)
+
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     // console.log(values)
@@ -47,6 +57,14 @@ const LoginForm = () => {
 
     startTransition(() => {
       login(values)
+      .then(data => {
+        console.log("when succ", data)
+        setSuccess("success my nigga")
+      })
+      .catch(err => {
+        // console.log("when err: ", err)
+        setError("Error ma nigga")
+      })
     })
   }  
   
@@ -55,6 +73,10 @@ const LoginForm = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
+        {/* Runtime messages. */}
+        <FormError message={error} />
+        <FormSucess message={success} />
+        
         <FormField
           control={form.control}
           name="email"
