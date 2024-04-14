@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model actions {
+  action_id         Int                 @id @default(autoincrement())
+  action            String              @unique @db.VarChar(20)
+  character_actions character_actions[]
+}
+
+model character_actions {
+  character_id Int
+  action_id    Int
+  actions      actions    @relation(fields: [action_id], references: [action_id], onDelete: NoAction, onUpdate: NoAction)
+  characters   characters @relation(fields: [character_id], references: [character_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([character_id, action_id])
+}
+
+model characters {
+  character_id      Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(30)
+  homeland          String?             @db.VarChar(60)
+  favorite_color    String?             @db.VarChar(30)
+  character_actions character_actions[]
+  more_info         more_info[]
+  sounds            sounds[]
+}
+
+model more_info {
+  more_info_id Int        @id @unique @default(autoincrement())
+  birthday     DateTime?  @db.Date
+  height_in_cm Int?
+  weight_in_cm Decimal?   @db.Decimal(4, 1)
+  character_id Int
+  characters   characters @relation(fields: [character_id], references: [character_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model sounds {
+  sound_id     Int        @id @default(autoincrement())
+  filename     String     @unique @db.VarChar(40)
+  character_id Int
+  characters   characters @relation(fields: [character_id], references: [character_id], onDelete: NoAction, onUpdate: NoAction)
+}
