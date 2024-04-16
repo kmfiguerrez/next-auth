@@ -1,42 +1,47 @@
-'use client'
 
-import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
-import {
-  NavigationMenu,
-  // NavigationMenuContent,
-  // NavigationMenuIndicator,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  // NavigationMenuTrigger,
-  // NavigationMenuViewport,
-} from "@/components/ui/navigation-menu"
 import Link from "next/link"
 
+import SignOutButton from "../auth/signOut-button"
 
-const NavLinks = () => {
+import { Button } from "../ui/button"
+
+import { auth } from "@/auth"
+
+
+const NavLinks = async () => {
+  const session = await auth()
+
   return (
-    <NavigationMenu className="max-w-full justify-end border">
-      <NavigationMenuList className="space-x-5">
+    <nav>
+      <ul className="flex justify-end space-x-4">
+        <li>
+          <Button
+            // variant={"link"}
+            asChild
+          >
+            <Link href={"/auth/register"}>Register</Link>
+          </Button>
+        </li>
 
-        <NavigationMenuItem>
-          <Link href={`/auth/register`} legacyBehavior passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Register
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
 
-        <NavigationMenuItem>
-          <Link href={`/auth/login`} legacyBehavior passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Login
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
+        {session === null ? (
+            <li>
+              <Button
+                // variant={"link"}
+                asChild
+              >
+                <Link href={"/auth/login"}>Login</Link>
+              </Button>
+            </li>
+          ) : (
+            <li>
+              <SignOutButton />
+            </li>
+          )
+        }
 
-      </NavigationMenuList>
-    </NavigationMenu>
+      </ul>
+    </nav>
   )
 }
 
