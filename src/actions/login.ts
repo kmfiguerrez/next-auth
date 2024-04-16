@@ -1,29 +1,39 @@
 "use server"
 
-import { TLoginSchema } from "@/schemas/login-schema"
-import RegisterSchema from "@/schemas/register-schema"
+import LoginSchema, { TLoginSchema } from "@/schemas/login-schema"
+import { signIn } from "@/auth"
+
+import { CredentialsSignin } from "next-auth"
 
 
 export const login = async (values: TLoginSchema) => {
   // Validate form values because server actions run on the server.
-  const validatedFields = RegisterSchema.safeParse(values)
-  const status = true
+  const validatedFields = LoginSchema.safeParse(values)
 
-  // if (!validatedFields.success) {
-  //   return { error: "Invalid fields!" }
-  // }
+  try {
+    if (!validatedFields.success) throw new Error("Invalid fields!")
+    
+    // This promise is for loading testing only
+    await new Promise((resolve, reject) => {
+      setTimeout(() => resolve("success"), 5000)
+    })      
 
-  // This promise is for loading testing only
-  await new Promise((resolve, reject) => {
-    setTimeout(() => resolve("success"), 5000)
-  })
-
-  if (!status) {
-    // return { error: "Invalid fields!" }
-    throw new Error("Invalid fields!")
+    const {email, password} = validatedFields.data
+    // The signIn is configured to throw an error.
+    await signIn("credentials", {email, password, redirectTo: "/"})
+  } 
+  catch (error: unknown) {
+    if (error instanceof CredentialsSignin) {
+      console.log("Inside login action: ", error.name)
+      throw new Error("Invalid credentials")
+    }
   }
-  
-  console.log(values)
+
+
+
+
+
+
   
   return { success: "aight"}
 }

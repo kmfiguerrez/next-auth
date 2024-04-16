@@ -1,6 +1,6 @@
 "use client"
  
-import { useTransition } from "react"
+import { useState, useTransition } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -8,6 +8,11 @@ import { useForm } from "react-hook-form"
 import RegisterSchema, { type TRegisterSchema } from "@/schemas/register-schema"
 
 import { RotateCw } from "lucide-react"
+
+import { register } from "@/actions/register"
+
+import FormError from "./form-error"
+import FormSucess from "./form-success"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -19,12 +24,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { register } from "@/actions/register"
+
 
 
 
 
 const RegisterForm = () => {
+  const [success, setSuccess] = useState<string | undefined>()
+  const [error, setError] = useState<string | undefined>()
   const [isPending, startTransition] = useTransition();
 
   // 1. Define your form.
@@ -39,6 +46,10 @@ const RegisterForm = () => {
 
   // 2. Define a submit handler.
   function onSubmit(values: TRegisterSchema) {
+    // Reset runtime messages first.
+    setSuccess(undefined)
+    setError(undefined)
+
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     // console.log(values)
@@ -47,6 +58,8 @@ const RegisterForm = () => {
 
     startTransition(() => {
       register(values)
+      .then(data => setSuccess(data.success))
+      .catch(error => setError(error))
     })
   }  
   
@@ -55,6 +68,10 @@ const RegisterForm = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
+        {/* Runtime messages. */}
+        <FormSucess message={success} />
+        <FormError message={error} />
+        
         <FormField
           control={form.control}
           name="name"

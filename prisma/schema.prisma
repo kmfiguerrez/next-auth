@@ -47,3 +47,41 @@ model sounds {
   character_id Int
   characters   characters @relation(fields: [character_id], references: [character_id], onDelete: NoAction, onUpdate: NoAction)
 }
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  // Password is optional because Oauth is also used which doesn't require
+  // password.
+  password      String?
+  image         String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  accounts      Account[]
+
+  @@map("users")
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}

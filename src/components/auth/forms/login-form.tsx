@@ -61,9 +61,8 @@ const LoginForm = () => {
         console.log("when succ", data)
         setSuccess("success my nigga")
       })
-      .catch(err => {
-        // console.log("when err: ", err)
-        setError("Error ma nigga")
+      .catch(error => {
+        setError(error.message)
       })
     })
   }  
@@ -74,8 +73,8 @@ const LoginForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
         {/* Runtime messages. */}
-        <FormError message={error} />
         <FormSucess message={success} />
+        <FormError message={error} />
         
         <FormField
           control={form.control}

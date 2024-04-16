@@ -1,12 +1,19 @@
-import CardWrapper from "@/components/card-wrapper";
-import RegisterForm from "@/components/forms/register-form";
+import { auth } from "@/auth"
 
+export default async function Home() {
+  const session = await auth()
 
-export default function Home() {
+  if (!session) return null
+
   return (
-    <main className="">
-
-      <h1>Server actions</h1>
+    <main className="text-white">
+      <h1>Homepage</h1>
+      <ul>
+        <li>Id: {session.user?.id}</li>
+        <li>Email: {session.user?.email}</li>
+        <li>Name: {session.user?.name}</li>
+        <li>Image: {session.user?.image}</li>
+      </ul>
     </main>
   );
 }

@@ -1,28 +1,34 @@
 "use server"
 
-import LoginSchema from "@/schemas/login-schema"
-import { type TRegisterSchema } from "@/schemas/register-schema"
+import prismaDb from "@/lib/prisma-db"
+import RegisterSchema, { type TRegisterSchema } from "@/schemas/register-schema"
+
 
 export const register = async (values: TRegisterSchema) => {
   // Validate form values because server actions run on the server.
-  const validatedFields = LoginSchema.safeParse(values)
-  const status = false
+  const validatedFields = RegisterSchema.safeParse(values)
 
-  // if (!validatedFields.success) {
-  //   return { error: "Invalid fields!" }
-  // }
+  if (!validatedFields.success) {
+    throw new Error("Invalid fields")
+  }
 
-  // This promise is for loading testing only
-  await new Promise((resolve, reject) => {
-    setTimeout(() => resolve("success"), 5000)
+  const {name, email, password} = validatedFields.data
+
+  // Create user
+  await prismaDb.user.create({
+    data: {
+      name,
+      email,
+      password
+    }
   })
 
-  if (!status) {
-    throw new Error("Invalid fields!")
-  }
+  // This promise is for loading testing only
+  // await new Promise((resolve, reject) => {
+  //   setTimeout(() => resolve("success"), 5000)
+  // })
+
   
-  console.log(values)
-  
-  return { success: "aight"}
+  return { success: "User created"}
 }
 
