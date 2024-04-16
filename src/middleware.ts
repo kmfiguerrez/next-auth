@@ -13,7 +13,7 @@ export default middleware((req) => {
   const isLoggedIn = !!req.auth
   const requestedRoutes = req.nextUrl.pathname
   console.log("From middleware.ts: ", req.auth)
-  console.log('Route', requestedRoutes)
+  console.log('Requested Route: ', requestedRoutes)
 
   const isApiAuthRoute: boolean = req.nextUrl.pathname.startsWith(apiAuthPrefix)
   const isPublicRoute: boolean = publicRoutes.includes(requestedRoutes)
