@@ -1,10 +1,12 @@
 "use server"
 
+import { getUserByEmail } from "@/lib/db-data"
 import { getServerErrorMessage } from "@/lib/error-message"
 import prismaDb from "@/lib/prisma-db"
 
-
 import RegisterSchema, { type TRegisterSchema } from "@/schemas/register-schema"
+
+import bcrypt from "bcryptjs"
 
 
 export const register = async (values: TRegisterSchema) => {
@@ -17,15 +19,26 @@ export const register = async (values: TRegisterSchema) => {
     }
 
     const {name, email, password} = validatedFields.data
+    // Hashed the password.
+    const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create user
-    // Create method throws an error: PrismaClientInitializationError
-    // if can't connect to db.
+    /*
+      Before creating a user make sure the email hasn't been used.
+      if exists, throw an error.
+    */
+    const existingUser = await getUserByEmail(email)
+    if (existingUser) throw new Error("Email already in use")
+
+    /*
+      Create user
+      The create method throws an error: PrismaClientInitializationError
+      if can't connect to db.
+    */
     await prismaDb.user.create({
       data: {
         name,
         email,
-        password
+        password: hashedPassword
       }
     })
 
@@ -35,12 +48,7 @@ export const register = async (values: TRegisterSchema) => {
     throw new Error(getServerErrorMessage(error))
   }  
 
-  // This promise is for loading testing only
-  // await new Promise((resolve, reject) => {
-  //   setTimeout(() => resolve("success"), 5000)
-  // })
-
-  
+  // Finally.
   return { success: "User created"}
 }
 
