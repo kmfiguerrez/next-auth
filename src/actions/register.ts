@@ -48,6 +48,8 @@ export const register = async (values: TRegisterSchema) => {
     throw new Error(getServerErrorMessage(error))
   }  
 
+  // TODO: Send verification token email
+
   // Finally.
   return { success: "User created"}
 }

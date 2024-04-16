@@ -1,14 +1,47 @@
-import { NextResponse } from "next/server"
-import { auth } from "./auth"
+import { auth as middleware } from "./auth"
 
-export default auth((req) => {
+import {
+  DEFAULT_LOGIN_REDIRECT,
+  authRoutes,
+  apiAuthPrefix,
+  publicRoutes
+} from "@/lib/routes"
+
+
+
+export default middleware((req) => {
   const isLoggedIn = !!req.auth
+  const requestedRoutes = req.nextUrl.pathname
   console.log("From middleware.ts: ", req.auth)
-  console.log('Route', req.nextUrl.pathname)
-  // if (!req.auth) {
-  //   return NextResponse.redirect("/login")
-  // }
+  console.log('Route', requestedRoutes)
+
+  const isApiAuthRoute: boolean = req.nextUrl.pathname.startsWith(apiAuthPrefix)
+  const isPublicRoute: boolean = publicRoutes.includes(requestedRoutes)
+  const isAuthRoute = authRoutes.includes(requestedRoutes)
+
+  // Always allows routes for authenticaiton purposes.
+  if (isApiAuthRoute) return 
+
+  // Allow to access register and login routes if not yet logged in.
+  if (isAuthRoute) {
+    if (isLoggedIn) {
+      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, req.nextUrl))
+    }
+    // Otherwise not logged in.
+    return
+  }
+
+  /*
+    If not logged in and requested routes are not public then redirect
+    the user.
+  */
+  if (!isLoggedIn && !isPublicRoute) {
+    return Response.redirect(new URL("/auth/login", req.nextUrl))
+  }
 })
+
+
+
 
 export const config = {
   matcher: [

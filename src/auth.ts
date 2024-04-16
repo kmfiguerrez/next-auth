@@ -1,8 +1,12 @@
-import NextAuth, { CredentialsSignin } from "next-auth"
+import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+
 import prismaDb from "./lib/prisma-db"
  
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  adapter: PrismaAdapter(prismaDb),
+  session: {strategy: "jwt"},
   providers: [
     Credentials({
       credentials: {
@@ -20,11 +24,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         let user = null
 
 
-        if (!user) {
-          throw new CredentialsSignin("User not found")
-        }
+        // if (!user) {
+        //   throw new CredentialsSignin("User not found")
+        // }
 
-        user = {name: "Tin", password: "Fat", extraInfo: "include?"}
+        // user = {name: "Tin", password: "Fat", extraInfo: "include?", email: "tae.com"}
+        user = {name: "Karen", email: "karen@babe.com", id:"pretty"}
         return user
       }
     })
