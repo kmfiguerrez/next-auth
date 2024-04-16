@@ -11,6 +11,7 @@ const DashboardPage = async () => {
       <ul>
         <li>Id: {session?.user?.id}</li>
         <li>Email: {session?.user?.email}</li>
+        <li>Role: {session?.user.role}</li>
         <li>Name: {session?.user?.name}</li>
         <li>Image: {session?.user?.image}</li>
       </ul>      

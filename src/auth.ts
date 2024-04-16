@@ -1,4 +1,4 @@
-import NextAuth, { CredentialsSignin } from "next-auth"
+import NextAuth, { type DefaultSession } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 
@@ -6,12 +6,58 @@ import prismaDb from "./lib/prisma-db"
 
 import LoginSchema from "./schemas/login-schema"
 
-import { getUserByEmail } from "./lib/db-data"
+import { getUserByEmail, getUserById } from "./lib/db-data"
 
 import bcrypt from "bcryptjs"
 
+import type { UserRole } from "@prisma/client"
+
  
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      role: UserRole
+    } & DefaultSession["user"]
+    
+  }
+}
+
+
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  callbacks: {
+    async jwt({ token, user }) {
+      /*
+        The shape of the user is defined in the prisma schema.
+        But not every field is available so we have to query the db.
+      */
+      if (user) { // User is available during sign-in
+        console.log("user: ", user)
+        token.id = user.id
+
+        // Query the user role from the database.
+        const existingUser = await getUserById(user.id as string)
+        token.role = existingUser?.role as UserRole
+      }
+      return token
+    },
+    async session({ session, token, user }) {
+      // Expose the user id from the session which is disabled by default
+      if (token.id && session.user) {
+        session.user.id = token.id as string
+      }
+
+      if (token.role && session.user) {
+        /*
+          In order for the role property to be typed-checked
+          See: https://authjs.dev/getting-started/typescript#module-augmentation
+        */
+        session.user.role = token.role as UserRole
+      }
+      return session
+    },
+  },
   adapter: PrismaAdapter(prismaDb),
   session: {strategy: "jwt"},
   providers: [
@@ -28,7 +74,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           See: https://authjs.dev/guides/extending-the-session
         */
         console.log("From auth.ts: ", credentials)
-        let user = null
         
         /*
           Verify credentials that are coming from any applications that
@@ -36,7 +81,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           See: https://authjs.dev/getting-started/authentication/credentials#verifying-data-with-zod
         */
         const validatedCredentials = LoginSchema.safeParse(credentials)
-        console.log(validatedCredentials.success)
 
         if (validatedCredentials.success) {
           const {email, password} = validatedCredentials.data

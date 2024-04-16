@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
+
 model actions {
   action_id         Int                 @id @default(autoincrement())
   action            String              @unique @db.VarChar(20)
@@ -56,6 +61,7 @@ model User {
   // Password is optional because Oauth is also used which doesn't require
   // password.
   password      String?
+  role          UserRole @default(USER)
   image         String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
