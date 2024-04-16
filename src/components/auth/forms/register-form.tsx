@@ -28,7 +28,6 @@ import {
 
 
 
-
 const RegisterForm = () => {
   const [success, setSuccess] = useState<string | undefined>()
   const [error, setError] = useState<string | undefined>()
@@ -59,7 +58,10 @@ const RegisterForm = () => {
     startTransition(() => {
       register(values)
       .then(data => setSuccess(data.success))
-      .catch(error => setError(error))
+      .catch(error => {
+        // console.log(error)
+        setError(error.message)
+      })
     })
   }  
   
