@@ -29,6 +29,17 @@ declare module "next-auth" {
 
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  events: {
+    async linkAccount({ user }) {
+      /*
+        Verify user's email when OAuth is used to create user.
+      */
+      await prismaDb.user.update({
+        where: {id: user.id},
+        data: {emailVerified: new Date()}
+      })
+    }
+  },
   callbacks: {
     async jwt({ token, user }) {
       /*
