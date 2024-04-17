@@ -58,8 +58,7 @@ const LoginForm = () => {
     startTransition(() => {
       login(values)
       .then(data => {
-        console.log("when succ", data)
-        setSuccess("success my nigga")
+        setSuccess(data?.success)
       })
       .catch(error => {
         setError(error.message)

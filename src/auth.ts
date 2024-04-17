@@ -71,6 +71,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return session
     },
+    async signIn({ user, account }) {
+      /*
+        If users managed to logged in using api request, then we can catch
+        them here.
+      */
+
+      // Allow OAuth without email verification.
+      if (account?.provider !== "credentials") return true
+
+      // Make sure that the email has verified when using credentials.
+      const existingUser = await getUserById(user.id as string)
+      if (!existingUser?.emailVerified) throw new Error("Email confirmation is required")
+
+      // TODO: Add 2FA check
+      
+      return true
+    },
   },
   adapter: PrismaAdapter(prismaDb),
   session: {strategy: "jwt"},

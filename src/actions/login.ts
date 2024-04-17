@@ -6,6 +6,8 @@ import { signIn } from "@/auth"
 import { DEFAULT_LOGIN_REDIRECT } from "@/lib/routes"
 
 import { AuthError } from "next-auth"
+import { getUserByEmail } from "@/lib/db-data"
+import { generateVericationToken } from "@/lib/token"
 
 
 export const login = async (values: TLoginSchema) => {
@@ -16,14 +18,31 @@ export const login = async (values: TLoginSchema) => {
     if (!validatedFields.success) throw new Error("Invalid fields!")
     
     const {email, password} = validatedFields.data
-    // The signIn is configured to throw an error.
+
+    // Check first if users have verified their email.
+    // const existingUser = await getUserByEmail(email)
+    // if (!existingUser || !existingUser.email || !existingUser.password) {
+    //   throw new Error("Invalid credentials")
+    // }
+    // if (!existingUser.emailVerified) {
+    //   const verificationToken = await generateVericationToken(existingUser.email)
+    //   return { success: "Confirmation email sent"}
+    // }
+
+
+    // The signIn throws a CredentialsSignIn error.
     await signIn("credentials", {email, password, redirectTo: DEFAULT_LOGIN_REDIRECT})
+
+    return {success: "cool"}
   } 
   catch (error: unknown) {
+    console.log("What's the error")
+    console.log(error)
     if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          throw new Error("Invalid credentials")
+      switch (error.type) {        
+        case "CredentialsSignin": {
+          throw new Error("Invalid credentials or Email has to be verified")
+        }
         default:
           throw new Error("Something went wrong")
       }
@@ -32,13 +51,6 @@ export const login = async (values: TLoginSchema) => {
     // This is required for the redirectTo to work.
     throw error
   }
-
-
-
-
-
-
   
-  return { success: "aight"}
 }
 
