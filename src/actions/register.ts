@@ -2,6 +2,7 @@
 
 import { getUserByEmail } from "@/lib/db-data"
 import { getServerErrorMessage } from "@/lib/error-message"
+import { sendVerificationEmail } from "@/lib/mail"
 import prismaDb from "@/lib/prisma-db"
 import { generateVericationToken } from "@/lib/token"
 
@@ -45,10 +46,10 @@ export const register = async (values: TRegisterSchema) => {
     
     // Send verification token.
     const verificationToken = await generateVericationToken(email)
+    await sendVerificationEmail(verificationToken.email, verificationToken.token)
 
     // Finally.
     return { success: "Confirmation email sent"}
-
   } 
   catch (error: unknown) {
     console.log(error)

@@ -8,6 +8,7 @@ import { DEFAULT_LOGIN_REDIRECT } from "@/lib/routes"
 import { AuthError } from "next-auth"
 import { getUserByEmail } from "@/lib/db-data"
 import { generateVericationToken } from "@/lib/token"
+import { sendVerificationEmail } from "@/lib/mail"
 
 
 export const login = async (values: TLoginSchema) => {
@@ -20,14 +21,17 @@ export const login = async (values: TLoginSchema) => {
     const {email, password} = validatedFields.data
 
     // Check first if users have verified their email.
-    // const existingUser = await getUserByEmail(email)
-    // if (!existingUser || !existingUser.email || !existingUser.password) {
-    //   throw new Error("Invalid credentials")
-    // }
-    // if (!existingUser.emailVerified) {
-    //   const verificationToken = await generateVericationToken(existingUser.email)
-    //   return { success: "Confirmation email sent"}
-    // }
+    const existingUser = await getUserByEmail(email)
+    if (!existingUser || !existingUser.email || !existingUser.password) {
+      throw new Error("Invalid credentials")
+    }
+    if (!existingUser.emailVerified) {
+      const verificationToken = await generateVericationToken(existingUser.email)
+
+      await sendVerificationEmail(verificationToken.email, verificationToken.token)
+
+      throw new Error("Please verify your email")
+    }
 
 
     // The signIn throws a CredentialsSignIn error.
