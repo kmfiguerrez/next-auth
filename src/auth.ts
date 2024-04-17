@@ -12,6 +12,9 @@ import bcrypt from "bcryptjs"
 
 import type { UserRole } from "@prisma/client"
 
+import GitHub from "next-auth/providers/github"
+import Google from "next-auth/providers/google"
+
  
 
 declare module "next-auth" {
@@ -61,6 +64,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prismaDb),
   session: {strategy: "jwt"},
   providers: [
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET
+    }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    }),
     Credentials({
       credentials: {
         email: {},
