@@ -3,6 +3,7 @@
 import { getUserByEmail } from "@/lib/db-data"
 import { getServerErrorMessage } from "@/lib/error-message"
 import prismaDb from "@/lib/prisma-db"
+import { generateVericationToken } from "@/lib/token"
 
 import RegisterSchema, { type TRegisterSchema } from "@/schemas/register-schema"
 
@@ -41,6 +42,12 @@ export const register = async (values: TRegisterSchema) => {
         password: hashedPassword
       }
     })
+    
+    // Send verification token.
+    const verificationToken = await generateVericationToken(email)
+
+    // Finally.
+    return { success: "Confirmation email sent"}
 
   } 
   catch (error: unknown) {
@@ -48,9 +55,6 @@ export const register = async (values: TRegisterSchema) => {
     throw new Error(getServerErrorMessage(error))
   }  
 
-  // TODO: Send verification token email
 
-  // Finally.
-  return { success: "User created"}
 }
 
