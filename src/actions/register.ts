@@ -25,7 +25,7 @@ export const register = async (values: TRegisterSchema) => {
     const hashedPassword = await bcrypt.hash(password, 10)
 
     /*
-      Before creating a user make sure the email hasn't been used.
+      Before creating a user make sure the email does not exists.
       if exists, throw an error.
     */
     const existingUser = await getUserByEmail(email)
@@ -52,7 +52,6 @@ export const register = async (values: TRegisterSchema) => {
     return { success: "Confirmation email sent"}
   } 
   catch (error: unknown) {
-    console.log(error)
     throw new Error(getServerErrorMessage(error))
   }  
 

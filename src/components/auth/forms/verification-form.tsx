@@ -45,6 +45,7 @@ const VerificationForm = () => {
       title='Confirming your verification'
       backButtonHref='/auth/login'
       backButtonLabel='Back to login'
+      className='mx-auto'
     >
       <div className='flex items-center w-full justify-center'>
         {!success || !error &&

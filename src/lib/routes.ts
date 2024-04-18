@@ -1,21 +1,27 @@
 /**
  * An array of routes that are accessible to the public.
- * These routes do not require authentication
+ * These routes do not require authentication.
+ * Both logged in or not can access this.
+ * 
  * @type {string[]}
  */
 export const publicRoutes: Array<string> = [
   "/",
-  "/auth/verification" // Both logged in or not can access this.
+  "/auth/verification",
 ]
 
 /**
  * An array of routes that are used for authentication.
  * These routes will redirect logged in users to /
+ * Only logged out users can access these.
+ * 
  * @type {string[]}
  */
 export const authRoutes: Array<string> = [
   "/auth/login",
-  "/auth/register"
+  "/auth/register",
+  "/auth/reset",
+  "/auth/new-password"
 ]
 
 /**

@@ -1,15 +1,14 @@
 "use client"
- 
+
 import { useState, useTransition } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
-import LoginSchema, { TLoginSchema } from "@/schemas/login-schema"
-
 import { RotateCw } from "lucide-react"
 
-import { login } from "@/actions/login"
+import ResetSchema, { TResetSchema } from "@/schemas/reset-schema"
+import { reset } from "@/actions/reset"
 
 import FormError from "./form-error"
 import FormSucess from "./form-success"
@@ -24,28 +23,27 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import Link from "next/link"
 
 
 
 
 
-const LoginForm = () => {
+
+const ResetForm = () => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>()
   const [success, setSuccess] = useState<string | undefined>()
 
   // 1. Define your form.
-  const form = useForm<TLoginSchema>({
-    resolver: zodResolver(LoginSchema),
-    defaultValues: {      
+  const form = useForm<TResetSchema>({
+    resolver: zodResolver(ResetSchema),
+    defaultValues: {
       email: "",
-      password: "",
     },
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: TLoginSchema) {
+  function onSubmit(values: TResetSchema) {
     // Reset runtime messages first.
     setSuccess(undefined)
     setError(undefined)
@@ -53,21 +51,21 @@ const LoginForm = () => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     // console.log(values)
-    
+
     if (isPending) alert("pending")
 
     startTransition(() => {
-      login(values)
-      .then(data => {
-        setSuccess(data?.success)
-      })
-      .catch(error => {
-        setError(error.message)
-      })
+      reset(values)
+        .then(data => {
+          setSuccess(data?.success)
+        })
+        .catch(error => {
+          setError(error.message)
+        })
     })
-  }  
-  
-  
+  }
+
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -75,7 +73,7 @@ const LoginForm = () => {
         {/* Runtime messages. */}
         <FormSucess message={success} />
         <FormError message={error} />
-        
+
         <FormField
           control={form.control}
           name="email"
@@ -88,35 +86,10 @@ const LoginForm = () => {
               <FormMessage />
             </FormItem>
           )}
-          
+
         />
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem className="mb-1">
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your password" {...field} type="password" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
-        {/* Forgot password */}
-        <Button 
-          variant={"link"}
-          asChild
-          className="font-normal ps-0 mb-4 text-xs"
-        >
-          <Link 
-            href={"/auth/reset"}
-          >
-            Forgot password
-          </Link>
-        </Button>
 
         <Button type="submit" className="w-full">
           {isPending ? (
@@ -125,7 +98,7 @@ const LoginForm = () => {
               Loading
             </span>
           ) : (
-            <span>Login</span>
+            <span>Forgot password</span>
           )}
         </Button>
 
@@ -134,4 +107,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default ResetForm
