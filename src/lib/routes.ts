@@ -5,7 +5,7 @@
  */
 export const publicRoutes: Array<string> = [
   "/",
-  "/auth/new-verification"
+  "/auth/verification" // Both logged in or not can access this.
 ]
 
 /**

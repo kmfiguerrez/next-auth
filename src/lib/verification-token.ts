@@ -6,10 +6,12 @@ export const getVerificationTokenByToken = async (token: string) => {
       where: {token}
     })
 
+    if (!verificationToken) throw new Error("Token does not exists")
+
     return verificationToken
   } 
   catch (error: unknown) {
-    
+    return null
   }
 }
 
@@ -19,9 +21,11 @@ export const getVerificationTokenByEmail = async (email: string) => {
       where: {email}
     })
 
+    if (!verificationToken) throw new Error("Token does not exists")
+
     return verificationToken
   } 
   catch (error: unknown) {
-    
+    return null
   }
 }

@@ -1,4 +1,4 @@
-import NextAuth, { type DefaultSession } from "next-auth"
+import NextAuth, { AuthError, type DefaultSession } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 
@@ -82,7 +82,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       // Make sure that the email has verified when using credentials.
       const existingUser = await getUserById(user.id as string)
-      if (!existingUser?.emailVerified) throw new Error("Email confirmation is required")
+      if (!existingUser?.emailVerified) throw new AuthError("Email confirmation is required")
 
       // TODO: Add 2FA check
       
