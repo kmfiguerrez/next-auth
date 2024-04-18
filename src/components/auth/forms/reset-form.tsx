@@ -89,9 +89,11 @@ const ResetForm = () => {
 
         />
 
-
-
-        <Button type="submit" className="w-full">
+        <Button 
+          type="submit"
+          disabled={success ? true : false}
+          className="w-full"
+        >
           {isPending ? (
             <span>
               <RotateCw className="mr-2 h-4 w-4 animate-spin" />

@@ -2,7 +2,6 @@
 
 import { getUserByEmail } from "@/lib/db-data"
 import { sendPasswordResetEmail } from "@/lib/mail"
-import { getPasswordResetTokenByEmail } from "@/lib/password-reset-token"
 import { generatePasswordResetToken } from "@/lib/token"
 import ResetSchema, { TResetSchema } from "@/schemas/reset-schema"
 
@@ -20,7 +19,7 @@ export const reset = async (value: TResetSchema) => {
     throw new Error("Email not found")
   }
 
-  const passwordResetToken = await generatePasswordResetToken(email)
+  const passwordResetToken = await generatePasswordResetToken(existingUser.email)
   await sendPasswordResetEmail(passwordResetToken.email, passwordResetToken.token)
 
   return {success: "Reset email sent"}

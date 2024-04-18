@@ -20,7 +20,6 @@ const VerificationForm = () => {
 
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
-  console.log(token) 
 
   const onSubmit = useCallback(() => {
     if (!token) {
