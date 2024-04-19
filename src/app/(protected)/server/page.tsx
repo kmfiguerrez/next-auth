@@ -1,6 +1,6 @@
 import { auth } from "@/auth"
+
 import UserInfo from "@/components/user-info"
-import type { User } from "next-auth" 
 
 
 const ServerPage = async () => {
