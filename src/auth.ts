@@ -1,4 +1,4 @@
-import NextAuth, { AuthError, type DefaultSession } from "next-auth"
+import NextAuth, { AuthError, CredentialsSignin, type DefaultSession } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 
@@ -14,6 +14,7 @@ import type { UserRole } from "@prisma/client"
 
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
+import { getTwoFactorConfirmationByUserId } from "./lib/two-factor-confirmation"
 
  
 
@@ -83,8 +84,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Make sure that the email has verified when using credentials.
       const existingUser = await getUserById(user.id as string)
       if (!existingUser?.emailVerified) throw new AuthError("Email confirmation is required")
-
-      // TODO: Add 2FA check
+      
+      // Execute this block only if users chose to enalbe 2FA.
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id)
+        if (!twoFactorConfirmation) throw new AuthError("Did not confirm 2FA code")
+        
+        // Otherwise 2FA code confirmed, delete two factor confirmation for next sign in.
+        await prismaDb.twoFactorConfirmation.delete({
+          where: { id: twoFactorConfirmation.id}
+        })
+      }
       
       return true
     },
@@ -129,7 +139,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             The right hand side expression: !user.password, happens when
             the OAuth is used.
           */
-          if (!user || !user.password) return null
+          // if (!user || !user.password) return null
+          if (!user || !user.password) throw new CredentialsSignin("error nigga")
+
 
           const passwordMatch = await bcrypt.compare(password, user.password)
 
@@ -138,8 +150,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         // Otherwise not success.
         // Return `null` to indicate that the credentials are invalid
-        return null
-
+        // return null
+        throw new CredentialsSignin("error bitch")
       }
     })
   ],

@@ -1,9 +1,11 @@
 import prismaDb from './prisma-db';
 
+import crypto from "crypto"
 import { v4 as uuidv4 } from 'uuid';
 
 import { getVerificationTokenByEmail } from './verification-token';
 import { getPasswordResetTokenByEmail } from './password-reset-token';
+import { getTwoFactorTokenByEmail } from './two-factor-token';
 
 
 export const generateVericationToken = async (email:string) => {
@@ -51,7 +53,7 @@ export const generatePasswordResetToken = async (email:string) => {
     })
   }
 
-  // Create new verification token.
+  // Create new password reset token.
   const passwordResetToken = await prismaDb.passwordResetToken.create({
     data: {
       email,
@@ -61,4 +63,33 @@ export const generatePasswordResetToken = async (email:string) => {
   })
 
   return passwordResetToken
+}
+
+
+export const generateTwoFactorToken = async (email:string) => {
+  const token = crypto.randomInt(100_000, 1_000_000).toString()
+
+  // Expire the token in one hour.
+  const expires = new Date(new Date().getTime() + (3600 * 1000))
+
+  // Check for existing token per email and delete it.
+  const existingToken = await getTwoFactorTokenByEmail(email)
+  if (existingToken) {
+    await prismaDb.twoFactorToken.delete({
+      where: {
+        id: existingToken.id
+      }
+    })
+  }
+
+  // Create new two factor token.
+  const twoFactorToken = await prismaDb.twoFactorToken.create({
+    data: {
+      email,
+      token,
+      expires
+    }
+  })
+
+  return twoFactorToken
 }
