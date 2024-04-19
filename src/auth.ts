@@ -1,4 +1,5 @@
-import NextAuth, { AuthError, CredentialsSignin, type DefaultSession } from "next-auth"
+import NextAuth,  { AuthError, CredentialsSignin, type DefaultSession } from "next-auth"
+
 import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 
@@ -14,18 +15,30 @@ import type { UserRole } from "@prisma/client"
 
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
-import { getTwoFactorConfirmationByUserId } from "./lib/two-factor-confirmation"
 
- 
+import { getTwoFactorConfirmationByUserId } from "./lib/two-factor-confirmation"
+import { boolean } from "zod"
+
+
+export type TExtendedUser = DefaultSession["user"] & {
+  role: UserRole
+  isTwoFactorEnabled: boolean
+}
 
 declare module "next-auth" {
   interface Session {
-    user: {
-      role: UserRole
-    } & DefaultSession["user"]
-    
+    user: TExtendedUser
   }
 }
+
+// From auth.js doc
+// declare module "next-auth" {
+//   interface Session {
+//     user: {
+//       role: UserRole
+//     } & DefaultSession["user"]
+//   }
+// }
 
 
 
@@ -54,6 +67,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Query the user role from the database.
         const existingUser = await getUserById(user.id as string)
         token.role = existingUser?.role as UserRole
+        token.isTwoFactorEnabled = existingUser?.isTwoFactorEnabled
       }
       return token
     },
@@ -70,6 +84,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         */
         session.user.role = token.role as UserRole
       }
+
+      if (session.user) {
+        /*
+          In order for the isTwoFactorEnabled property to be typed-checked
+          See: https://authjs.dev/getting-started/typescript#module-augmentation
+        */
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean
+      }      
+
       return session
     },
     async signIn({ user, account }) {

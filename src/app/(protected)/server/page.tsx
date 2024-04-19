@@ -1,12 +1,14 @@
 import { auth } from "@/auth"
+import UserInfo from "@/components/user-info"
+import type { User } from "next-auth" 
+
 
 const ServerPage = async () => {
   const user = await currentUser()
-  console.log(user)
 
   return (
     <div className="text-white">
-      {JSON.stringify(user)}
+      <UserInfo user={user} label="Server Component"/>
     </div>
   )
 }
