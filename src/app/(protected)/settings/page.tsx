@@ -1,14 +1,43 @@
 "use client"
 
+import { useTransition } from "react"
+
+import { settings } from "@/actions/settings"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { useSession } from "next-auth/react"
 
+
 const SettingsPage = () => {
-  const session = useSession()
-  
+  const { update } = useSession()
+  const [isPending, startTransition] = useTransition()
+
+  const handleClick = () => {
+    startTransition(() => {
+      settings({name: "kimjoon"})
+      .then(data => {
+        /*
+          Update the session but what this function does is run
+          auth callbacks again. 
+        */
+        update()
+      })
+      .catch(error => console.log(error.message))
+    })
+  }
+
   return (
-    <div className="bg-white p-10 rounded-xl">
-      {JSON.stringify(session)}
-    </div>
+    <Card className="w-[600px]">
+      <CardHeader>
+        <p className="text-2xl font-semibold text-center">Settings</p>
+      </CardHeader>
+      <CardContent>
+        <Button disabled={isPending} onClick={handleClick}>
+          Update Name
+        </Button>
+      </CardContent>
+    </Card>
   )
 }
 

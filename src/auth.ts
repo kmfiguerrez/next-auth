@@ -60,18 +60,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         The shape of the user is defined in the prisma schema.
         But not every field is available so we have to query the db.
       */
-      if (user) { // User is available during sign-in
-        console.log("user: ", user)
-        token.id = user.id
+      // if (!token.sub) throw new Error("JWT Error: No Token!")
+      if (!token.sub) return token
 
-        // Query the user role from the database.
-        const existingUser = await getUserById(user.id as string)
-        token.role = existingUser?.role as UserRole
-        token.isTwoFactorEnabled = existingUser?.isTwoFactorEnabled
-      }
+
+      // Query the user role from the database.
+      const existingUser = await getUserById(token.sub)
+      console.log("From JWT: ", existingUser)
+
+      // if (!existingUser) throw new Error("JWT Error: User does not exists!")
+      if (!existingUser) return token
+
+      token.id = existingUser.id
+      token.role = existingUser.role 
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled    
+
+      /*
+        When session is being updated, callbacks will be ran again.
+      */
+      token.name = existingUser.name
+      token.email = existingUser.email
+
       return token
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
       // Expose the user id from the session which is disabled by default
       if (token.id && session.user) {
         session.user.id = token.id as string
@@ -91,7 +103,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           See: https://authjs.dev/getting-started/typescript#module-augmentation
         */
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean
-      }      
+      }
+
+      /*
+        This if block is used when sesesion is being updated.
+      */      
+      if (session.user) {
+        session.user.name = token.name
+        session.user.email = token.email as string
+      }           
 
       return session
     },
