@@ -18,11 +18,13 @@ import Google from "next-auth/providers/google"
 
 import { getTwoFactorConfirmationByUserId } from "./lib/two-factor-confirmation"
 import { boolean } from "zod"
+import { getAccountByUserId } from "./lib/accounts"
 
 
 export type TExtendedUser = DefaultSession["user"] & {
   role: UserRole
   isTwoFactorEnabled: boolean
+  isOAuth: boolean
 }
 
 declare module "next-auth" {
@@ -60,16 +62,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         The shape of the user is defined in the prisma schema.
         But not every field is available so we have to query the db.
       */
-      // if (!token.sub) throw new Error("JWT Error: No Token!")
       if (!token.sub) return token
-
 
       // Query the user role from the database.
       const existingUser = await getUserById(token.sub)
       console.log("From JWT: ", existingUser)
 
-      // if (!existingUser) throw new Error("JWT Error: User does not exists!")
       if (!existingUser) return token
+
+      /*
+        The isOAuth property is used to show different setting for users
+        who used OAuth to logged in.
+      */
+      const existingAccount = await getAccountByUserId(existingUser.id)
+      token.isOAuth = !!existingAccount
 
       token.id = existingUser.id
       token.role = existingUser.role 
@@ -111,6 +117,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.name = token.name
         session.user.email = token.email as string
+        session.user.isOAuth = token.isOAuth as boolean
       }           
 
       return session
